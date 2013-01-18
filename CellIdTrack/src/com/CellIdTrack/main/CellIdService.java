@@ -25,6 +25,7 @@ import android.widget.Toast;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import java.lang.Thread;
+import android.text.format.Time;
 
 
 	
@@ -88,7 +89,7 @@ public class CellIdService extends Service {
 	
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "Сервис onCreate", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Сервис onCreate", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onCreate");
 	    
 		/* Initialize PreviousCells Array to defined values */
@@ -115,7 +116,7 @@ public class CellIdService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Toast.makeText(this, "Сервис onStartCommand", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Сервис onStartCommand", Toast.LENGTH_SHORT).show();
 	    //handleCommand(intent);
 	    // We want this service to continue running until it is explicitly
 	    // stopped, so return sticky.
@@ -124,11 +125,12 @@ public class CellIdService extends Service {
 	
 	
 	public void MakeThread(){
-		Toast.makeText(CellIdService.this, "MakeThread begin", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(CellIdService.this, "MakeThread begin", Toast.LENGTH_SHORT).show();
 	    thr = new Thread(null, backgroundRefresh, "ServiceCellIdHandler");
 		thr.start();
 	}
 	
+
 
     
 	@Override
@@ -157,107 +159,25 @@ public class CellIdService extends Service {
 		};
 		
 		
-		 public void CheckChangePosition(){
-			
-	           NeedToWrite = false;
-	           // Check if the current cell has changed and increase counter if necessary 
-	           if (NewCellId != LastCellId) {
-	          	 LastCellId = NewCellId; 
-	          	 NeedToWrite = true;
-	           }
-	                        
-	           //outputText += "Number of Cell Changes: " +  String.valueOf(NumberOfCellChanges) + "\r\n";
-	           
-	           // Check if the current cell change is not a ping-pong cell change and increase counter 
-	      	 boolean IsCellInArray = false;
+public void CheckChangePosition(){
+  if ( (NewCellId != LastCellId) || (NewLacId != LastLacId)  ) {
+	LastCellId = NewCellId; 
+	LastLacId  = NewLacId; 
+	outputText  = DateFormat.getDateInstance().format(new Date()) + " ";
+	outputText += DateFormat.getTimeInstance().format(new Date()) + ", ";
 
-	      	 
-	           for (int x = 0; x < PreviousCells.length; x++) {
-	          	 if (PreviousCells[x] == NewCellId){
-	          		 IsCellInArray = true;
-	          		 break;
-	          	 }
-	           }
-	           
-	           
-	           // if the cell change was unique 
-	           if (IsCellInArray == false) {            	 
-	          	 // increase unique cell change counter and save cell id in array at current index 
-	          	// NumberOfUniqueCellChanges++;
-	          	 PreviousCells [PreviousCellsIndex] = NewCellId;
-	       	         	 
-	          	 // Increase index and wrap back to 0 in case it is at the end of the array 
-	          	 PreviousCellsIndex++;
-	          	 if (PreviousCellsIndex == PreviousCells.length)
-	          		 PreviousCellsIndex = 0;
-	           } // else: do not increase the counter 
-	           
-
-	           
-	           // Check if the current LAC has changed and increase counter if necessary 
-	           if (NewLacId != LastLacId) {
-	          	 LastLacId = NewLacId;
-	          	 NeedToWrite = true;
-	           }
-
-	           
-	 
-	           
-	           if( NeedToWrite ){
-	           outputText  = DateFormat.getDateInstance().format(new Date()) + " ";
-	           outputText += DateFormat.getTimeInstance().format(new Date()) + ", ";
-
-	  		 //Формать записи в файл DTM,mcc+mnc,lac,cellid, 1/0 (1 инфо по вышке достоверна),расстояние
-	  		 outputText += Tel.getNetworkOperator()+','+String.valueOf(NewLacId)+','+String.valueOf(NewCellId);
-
-	          
-	           //if the cell change was unique 
-	           if (IsCellInArray == false) {
-	          	// mark it with a '1' field in the output file 
-	          	 outputText += "1, "; 
-	          	
-	          	// calculate distance to previous cell if location information is available 
-	          	if (PrevLocation != null) {
-	          		DistanceToLastCell = PrevLocation.distanceTo(CurrentLocation);
-	          		outputText +=  String.valueOf(DistanceToLastCell) ;
-	              	
-	              	PrevLocation = CurrentLocation;               	
-	          	} 
-	          	else {
-	              	// set the distance to the previous cell to 0 
-	              	 outputText += "0 ";
-	          	}
-	          		
-	           }
-	           else {
-	          	// the cell id is not unique 
-	          	 
-	          	// mark the non unique cell change or no cell change at all with a '0' in the output file
-	          	 outputText += "0, ";
-	          	
-	          	// set the distance to the previous cell to 0 
-	          	 outputText += "0 ";
-	          	
-	           }           	 
-	           
-	           outputText += "\r\n";
-	           
-	          
-	           
-	        	 saveDataToFile(outputText);
-	           }//if NeedToWrite
-	        	outputText = "";
-			
-		}		
+	//Формать записи в файл DTM,mcc+mnc,lac,cellid, 1/0 (1 инфо по вышке достоверна),расстояние
+	outputText += Tel.getNetworkOperator()+','+String.valueOf(NewLacId)+','+String.valueOf(NewCellId);
+	outputText += "\r\n";
+	                  
+	saveDataToFile(outputText);
+  }
+}		
 	
 	@Override
 	public void onStart(Intent intent, int startid) {
-		Toast.makeText( this, "Service onStart", Toast.LENGTH_SHORT).show();
+		//Toast.makeText( this, "Service onStart", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onStart");
-		
-		
-
-		//thr.start();
 	}
 	
 
@@ -270,9 +190,6 @@ private class MyPhoneStateListener extends PhoneStateListener {
    }
  
   };
-	
-	
-
 
 	private void saveDataToFile(String LocalFileWriteBufferStr) {
         /* write measurement data to the output file */
@@ -296,35 +213,13 @@ private class MyPhoneStateListener extends PhoneStateListener {
     }
     
 	 public void GetAndWriteCellId() {
-	  	 
 	  	 Log.d(TAG,"GetAndWriteCellId");
-	  	 
-	  	 // a try enclosure is necessary as an exception is thrown inside if the network is currently
-	  	  //not available.
-	  	  //
-	  	 try {
+ 	  	 try {
 	  		 outputText = "";
-	//getNetworkOperator() MCC+MNC
-	  		 
-	  		 
 	  		 //Формат запроса OpenCellId.org  mnc=%d&mcc=%d&lac=%d&cellid=%d
-	  		 
-	  		 
-	  		 // output signal strength value directly on canvas of the main activity 
-	         //  NumberOfSignalStrengthUpdates += 1;
-	           //outputText += "Number of updates: " + String.valueOf(NumberOfSignalStrengthUpdates) + "\r\n\r\n";
-	                     
-	            
 	           GsmCellLocation myLocation = (GsmCellLocation) Tel.getCellLocation();
-
-
 	           NewCellId = myLocation.getCid();  
 	           NewLacId = myLocation.getLac();
-
-         
-	           
-	          
-	              
 	  	 }
 	  	 catch (Exception e) {
 	  		 outputText = "No network information available..."; 

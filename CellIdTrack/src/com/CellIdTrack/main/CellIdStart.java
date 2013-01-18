@@ -48,7 +48,9 @@ public class CellIdStart  extends Activity implements OnClickListener {
         IntentFilter filter = new IntentFilter(CellIdService.NEW_FOUND);
         receiver = new AlarmReceiver();
         registerReceiver(receiver, filter);
-	    
+        
+        Intent intent = new Intent(this, CellIdService.class); 
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
 	  }
 
 	    @Override
@@ -102,7 +104,7 @@ public class CellIdStart  extends Activity implements OnClickListener {
 	    	  }
 	    	  
 	    	  public void onServiceConnected(ComponentName name, IBinder service) {
-	    	   Toast.makeText(CellIdStart.this, "Service is connected", Toast.LENGTH_SHORT ).show();
+	    	   //Toast.makeText(CellIdStart.this, "Service is connected", Toast.LENGTH_SHORT ).show();
 	    	   mBounded = true;
 	    	   LocalBinder mLocalBinder = (LocalBinder)service;
 	    	   mServer = mLocalBinder.getServerInstance();
@@ -115,7 +117,7 @@ public class CellIdStart  extends Activity implements OnClickListener {
 	  switch (src.getId()) {
 	    case R.id.buttonStart:
 	      Log.d(TAG, "onClick: starting srvice");
-	      Toast.makeText( this, "Запускаем сервис", Toast.LENGTH_SHORT).show();
+	     // Toast.makeText( this, "Запускаем сервис", Toast.LENGTH_SHORT).show();
 	      Intent intent = new Intent(this, CellIdService.class);
 	      //startService(intent);
 	      bindService(intent, mConnection, BIND_AUTO_CREATE);

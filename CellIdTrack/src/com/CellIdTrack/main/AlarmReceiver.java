@@ -7,7 +7,6 @@ import android.content.Intent;
 
 public class AlarmReceiver extends BroadcastReceiver 
 {
-//test
 	public static final String ACTION_REFRESH_ALARM = "com.CellIdTrack.main.ACTION_REFRESH_ALARM";
     @Override
     public void onReceive(Context context,Intent intent) 
