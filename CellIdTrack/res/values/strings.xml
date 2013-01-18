@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">CellIdTrack</string>
+    <string name="ServicesDemo">Services Demo</string>
+    <string name="ServiceStart">Start</string>
+    <string name="ServiceStop">Stop</string>
+
+</resources>
