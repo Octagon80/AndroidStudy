@@ -22,7 +22,7 @@ import android.util.Log;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import java.lang.Thread;
-
+import android.app.Notification;
 
 
 	
@@ -40,7 +40,7 @@ public class CellIdService extends Service {
 		
 
 	 private TelephonyManager Tel;
-	 private MyPhoneStateListener MyListener;
+	private MyPhoneStateListener MyListener;
 	 boolean ListenerIsExec = false;
 	 
 
@@ -87,6 +87,12 @@ public class CellIdService extends Service {
 		//Toast.makeText(this, "Сервис onCreate", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onCreate");
 	    
+		Intent i=new Intent(this, CellIdService.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		Notification note = new Notification( 0, null, System.currentTimeMillis() );
+	    note.flags |= Notification.FLAG_NO_CLEAR;
+	    PendingIntent pi=PendingIntent.getActivity(this, 0, i, 0);
+	    startForeground( 42, note );
 
 		//Обеспечим асинхронный вызов процедуры при изменении параметров сети GSM
         MyListener = new MyPhoneStateListener();
@@ -107,7 +113,9 @@ public class CellIdService extends Service {
 	    int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
 	    long timeToRefresh = SystemClock.elapsedRealtime() + updateFreq*1000;
 	    alarms.setRepeating(alarmType, timeToRefresh,updateFreq*1000, alarmIntent);
-				
+	   
+        GetAndWriteCellId();
+	    
         MakeThread();
   	}
 
@@ -151,6 +159,7 @@ public class CellIdService extends Service {
  	@Override public void onDestroy() {
 		//Toast.makeText( this, "Сервис остановлен", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onDestroy");
+		stopForeground(true);
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
 		ThreadMustStop = true;
 		thr.stop();
@@ -166,8 +175,8 @@ public class CellIdService extends Service {
 			 // Toast.makeText(CellIdService.this, "Runnable-Run begin", Toast.LENGTH_SHORT).show();
 	  	    while ( ThreadMustStop != true ) {
         		//Если обработчик изенения параметров сети GSM сработал, записать изменения
-	  	    	if( ListenerIsExec )  CheckChangePosition();
-			    SystemClock.sleep(3 * 1000);//Надо другой вызов засыпания.
+	  	    	if( ListenerIsExec ) CheckChangePosition();
+			    SystemClock.sleep(10 * 1000);//Надо другой вызов засыпания.
 		     }   
 		  }		  
 			  
@@ -239,9 +248,11 @@ private class MyPhoneStateListener extends PhoneStateListener {
 	  		 outputText = "";
 	  		 //Формат запроса OpenCellId.org  mnc=%d&mcc=%d&lac=%d&cellid=%d
 	           GsmCellLocation myLocation = (GsmCellLocation) Tel.getCellLocation();
-	           NewCellId = myLocation.getCid();  
-	           NewLacId = myLocation.getLac();
-	           ListenerIsExec = true;
+	           if( myLocation != null ){
+	             NewCellId = myLocation.getCid();  
+	             NewLacId = myLocation.getLac();
+	             ListenerIsExec = true;
+	           };  
 	  	 }
 	  	 catch (Exception e) {
 	  		 outputText = "No network information available..."; 
