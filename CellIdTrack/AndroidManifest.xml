@@ -1,12 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.CellIdTrack.main"
     android:versionCode="0"
-    android:versionName="0.3" >
+    android:versionName="0.5" >
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16" />
      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +27,22 @@
          <service android:enabled="true"  android:name=".CellIdService"/>
        <receiver android:name=".AlarmReceiver">
            <intent-filter><action android:name="com.CellIdTrack.main.ACTION_REFRESH_ALARM"/></intent-filter>
+           
       </receiver> 
+      <receiver android:name=".PhoneIntentReceiver" 
+            android:enabled="true" 
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
+              <receiver android:name=".PhoneIntentReceiver" 
+            android:enabled="true" 
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
     </application>
     
     

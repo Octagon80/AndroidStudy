@@ -4,5 +4,6 @@
     <string name="ServicesDemo">Services Demo</string>
     <string name="ServiceStart">Start</string>
     <string name="ServiceStop">Stop</string>
-
+    <string name="StartCall">StartCall</string>
+    
 </resources>

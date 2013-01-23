@@ -49,8 +49,6 @@ public class CellIdStart  extends Activity implements OnClickListener {
         receiver = new AlarmReceiver();
         registerReceiver(receiver, filter);
         
-        Intent intent = new Intent(this, CellIdService.class); 
-        bindService(intent, mConnection, BIND_AUTO_CREATE);
 	  }
 
 	    @Override
