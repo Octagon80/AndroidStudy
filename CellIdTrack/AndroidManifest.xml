@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
 
     <application
         android:allowBackup="true"
@@ -43,6 +45,17 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <receiver  android:name=".PhoneIntentReceiver">
+            <intent-filter >
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL"> </action>
+            </intent-filter>
+        </receiver>
+        <receiver  android:name=".PhoneIntentReceiver">
+            <intent-filter >
+                <action android:name="android.provider.Telephony.NEW_OUTGOING_SMS"> </action>
+            </intent-filter>
+        </receiver>
+        
     </application>
     
     

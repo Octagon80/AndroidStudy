@@ -55,7 +55,7 @@ public class CellIdService extends Service {
 
 	 public static volatile PowerManager.WakeLock lockStatic=null;
 
-
+	 SMSOutMonitor sms;
 
   	 long NewCellId = 0; 
   	 long NewLacId = 0;
@@ -97,6 +97,11 @@ public class CellIdService extends Service {
 
 		saveDataToFile("Начало работы сервиса");
 	    
+		
+		  sms = new SMSOutMonitor();
+		  sms.SMSMonitor( this );
+	      sms.startSMSMonitoring();
+	      
 	     pm = ((PowerManager) getSystemService(Context.POWER_SERVICE));
 	     CPULock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
 	     CPULock.acquire();
@@ -165,6 +170,7 @@ public class CellIdService extends Service {
 	************************************************************************/
  	@Override public void onDestroy() {
 		//Toast.makeText( this, "Сервис остановлен", Toast.LENGTH_SHORT).show();
+ 		sms.stopSMSMonitoring();
 		Log.d(TAG, "onDestroy");
 		 CPULock.release();
 		//stopForeground(true);

