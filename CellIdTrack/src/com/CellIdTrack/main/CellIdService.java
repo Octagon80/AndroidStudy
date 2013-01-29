@@ -24,7 +24,7 @@ import android.util.Log;
 import android.app.PendingIntent;
 import android.app.AlarmManager;
 import java.lang.Thread;
-//import android.app.Notification;
+import android.app.Notification;
 
 
 	
@@ -98,15 +98,22 @@ public class CellIdService extends Service {
 		saveDataToFile("Начало работы сервиса");
 	    
 		
-		  sms = new SMSOutMonitor();
+		/*2012-01-29 sms = new SMSOutMonitor();
 		  sms.SMSMonitor( this );
 	      sms.startSMSMonitoring();
+	      */
 	      
 	     pm = ((PowerManager) getSystemService(Context.POWER_SERVICE));
 	     CPULock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
 	     CPULock.acquire();
 		
-		
+
+	 //    startForeground(1234, notice);
+	     
+	     
+	     
+	     
+	     
 		//Обеспечим асинхронный вызов процедуры при изменении параметров сети GSM
         MyListener = new MyPhoneStateListener();
 	    Tel = (TelephonyManager) getSystemService( TELEPHONY_SERVICE);
@@ -139,7 +146,8 @@ public class CellIdService extends Service {
 	************************************************************************/
 	@Override public int onStartCommand(Intent intent, int flags, int startId) {
 		//Toast.makeText(this, "Сервис onStartCommand", Toast.LENGTH_SHORT).show();
-	    
+		super.onStartCommand(intent, flags, startId);
+		
 		//Разместив привязку к прослушке дополнительно здесь,  
 		//Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		
@@ -170,10 +178,10 @@ public class CellIdService extends Service {
 	************************************************************************/
  	@Override public void onDestroy() {
 		//Toast.makeText( this, "Сервис остановлен", Toast.LENGTH_SHORT).show();
- 		sms.stopSMSMonitoring();
+ 		//2012-01-29 sms.stopSMSMonitoring();
 		Log.d(TAG, "onDestroy");
 		 CPULock.release();
-		//stopForeground(true);
+		 stopForeground(true);
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
 		ThreadMustStop = true;
 		thr.stop();
